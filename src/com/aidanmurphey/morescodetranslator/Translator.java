@@ -3,32 +3,39 @@ package com.aidanmurphey.morescodetranslator;
 import com.aidanmurphey.jsjf.LinkedBinaryTree;
 
 public class Translator {
+
+    private LinkedBinaryTree<Character> alphabet;
+
+    public Translator(LinkedBinaryTree<Character> alphabet) {
+        this.alphabet = alphabet;
+    }
     
-    public static String translateLine(LinkedBinaryTree<Character> alphabet, String line) {
-        String output = "", curLetter = "";
-        
+    public String translateLine(String line) {
+        StringBuilder output = new StringBuilder();
+        String curLetter = "";
+
         for(char x : line.toCharArray()) {
             if (x == '|') {
                 curLetter = "";
-                output += " ";
+                output.append(" ");
             } else if (x == '-' || x == '.') {
                 curLetter += x;
             } else if (!curLetter.equals("") && !curLetter.equals(" ")) {
-                output += getLetter(alphabet, curLetter);
+                output.append(getLetter(curLetter));
                 curLetter = "";
             }
             
         }
         
-        return output;
+        return output.toString();
     }
     
-    public static char getLetter(LinkedBinaryTree<Character> alphabet, String morseCodeWord) {
+    private char getLetter(String morseCodeWord) {
         return getLetter(alphabet, morseCodeWord, 0).getRootElement();
     }
     
-    public static LinkedBinaryTree<Character> getLetter(LinkedBinaryTree<Character> tree, String match, int level) {
-        LinkedBinaryTree<Character> next = null;
+    private LinkedBinaryTree<Character> getLetter(LinkedBinaryTree<Character> tree, String match, int level) {
+        LinkedBinaryTree<Character> next;
         
         try {
             if (match.charAt(level) == '-')
@@ -36,7 +43,7 @@ public class Translator {
             else
                 next = tree.getRight();
         } catch(Exception e) {
-            return new LinkedBinaryTree(' ');
+            return new LinkedBinaryTree<>(' ');
         }
         
         if (level + 1 == match.length()) {
