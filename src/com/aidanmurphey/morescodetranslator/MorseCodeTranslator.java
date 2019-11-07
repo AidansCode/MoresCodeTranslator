@@ -1,39 +1,105 @@
 package com.aidanmurphey.morescodetranslator;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Scanner;
+
 import com.aidanmurphey.jsjf.LinkedBinaryTree;
 
 public class MorseCodeTranslator {
 
-    public static void main(String[] args) {
-        LinkedBinaryTree<Character> alphabet = initAlphabet();
-        Translator translator = new Translator(alphabet);
+    private static Scanner keyboardReader;
+    private static Translator translator;
 
+    public static void main(String[] args) {
+        keyboardReader = new Scanner(System.in);
+        LinkedBinaryTree<Character> alphabet = initAlphabet();
+        translator = new Translator(alphabet);
+
+        displayPreOrder(alphabet);
+
+        while (processInput());
+
+        keyboardReader.close();
+        System.out.println("End of program");
+    }
+
+    public static boolean processInput() {
+        String inputType = getInputType();
+        if (inputType.equals("-1")) return false;
+
+        ArrayList<String> input = inputType.equals("file") ? getFileInput() : getKeyboardInput();
+
+        input.forEach((morseCode) -> {
+            System.out.println("\"" + morseCode + "\" translates to: ");
+            System.out.println(translator.translateLine(morseCode));
+            System.out.println();
+        });
+
+        return true;
+    }
+
+    public static ArrayList<String> getFileInput() {
+        ArrayList<String> result = new ArrayList<>();
+
+        boolean exists;
+        String fileName = null;
+
+        do {
+            if (fileName != null)
+                System.out.println("File could not be found! Try again");
+
+            System.out.print("Enter the file to be read: ");
+            fileName = keyboardReader.nextLine();
+
+            File file = new File(fileName);
+            exists = file.exists();
+        } while(!exists);
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                result.add(line);
+            }
+        } catch(Exception e) {}
+
+        return result;
+    }
+
+    public static ArrayList<String> getKeyboardInput() {
+        ArrayList<String> result = new ArrayList<>();
+
+        String input;
+        do {
+            System.out.println("All valid Morse code must end with a '#' and be 240 characters or less");
+            System.out.print("Enter Morse code to be translated: ");
+            input = keyboardReader.nextLine();
+        } while (input.length() > 240 || input.charAt(input.length() - 1) != '#');
+
+        result.add(input);
+
+        return result;
+    }
+
+    public static String getInputType() {
+        String input;
+
+        do {
+            System.out.print("Select an input method (file/keyboard or -1 to terminate): ");
+            input = keyboardReader.nextLine().toLowerCase();
+        } while(!input.equals("file") && !input.equals("keyboard") && !input.equals("-1"));
+
+        return input;
+    }
+
+    public static void displayPreOrder(LinkedBinaryTree<Character> alphabet) {
         System.out.println("Preorder list:");
         alphabet.iteratorPreOrder().forEachRemaining(System.out::print);
         System.out.println();
-        
-        Scanner scanner = new Scanner(System.in);
-        String input;
-        System.out.println("All valid Morse code must end with a #");
-        do {
-            System.out.print("Enter Morse code to be translated (-1 to terminate): ");
-            input = scanner.nextLine();
-            
-            if (!input.equals("-1")) {
-                
-                if (input.length() > 240) {
-                    System.out.println("Max character limit of 240! Try again");
-                } else {
-                    String english = translator.translateLine(input);
-                    System.out.println(english);
-                }
-            }
-        } while (!input.equals("-1"));
-        
-        System.out.println("End of program");
     }
-    
+
     private static LinkedBinaryTree<Character> initAlphabet() {
         LinkedBinaryTree<Character> h = new LinkedBinaryTree<>('H');
         LinkedBinaryTree<Character> v = new LinkedBinaryTree<>('V');
