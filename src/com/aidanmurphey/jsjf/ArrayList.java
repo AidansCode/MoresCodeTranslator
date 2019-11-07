@@ -11,7 +11,7 @@ import java.util.*;
  * @author Java Foundations
  * @version 4.0
  */
-public class ArrayList<T> implements ListADT<T>, Iterable<T>
+public abstract class ArrayList<T> implements ListADT<T>, Iterable<T>
 {
     private final static int DEFAULT_CAPACITY = 100;
     private final static int NOT_FOUND = -1;
